@@ -55,4 +55,14 @@ In the coming days, weeks, months, and (hopefully) years, I plan to blog about m
 
 Expect to see a lot of discussions about mobile development, cloud development, microservices, software architecture, design patterns, electronics and robotics. Expect to see some recipes from my cooking adventures or insights into raising children. Expect to follow my journey and see the highs and lows of my life through my eyes.
 
+## Why Did I Stop Blogging Before?
+
+It has been several years since I have actively blogged. As I mentioned, I hit a bad case of writer's block. I just kind of lost my passion for it. I was dealing with some personal and professional frustration and was finding it hard to write. It wasn't that I didn't want to blog. I was just having a hard time getting my ideas down and expressing myself.
+
+I also was growing impatient with my website. I wanted the website to look and work a certain way and I couldn't really figure out or dedicate the time to getting it to be *perfect*. Perfection has long been a hard problem for me and would lead to depression when I couldn't get it right. It either had to be perfect or I was unhappy with it. Unfortunately, I didn't really know what *perfect* really was, and that made me depressed.
+
+With 2021 starting, I'm making a greater effort to break out of my pursuit of perfection. I'll go with what works. For example, I'm starting my blog using a publicly available theme for [Hugo](https://gohugo.io) named [uBlogger](https://ublogger.netlify.app). The theme isn't perfect, and my adoption of it isn't quite perfect yet, but I'll improve it over time. It's an iterative evolution. Just like my blog and my software, things will evolve. I'll make changes. I'll tinker. I'll write. I'll do my best to keep moving forward.
+
+## Thank You For Visiting
+
 If you joined me before, welcome back and thank you for giving me another chance. If you're new to my blog, welcome and I hope that you get enjoyment and value from my future blog posts.
