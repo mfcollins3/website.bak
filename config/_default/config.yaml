@@ -1,0 +1,85 @@
+# Copyright 2012-2021 Michael F. Collins, III
+
+author:
+  name: michael-collins
+baseURL: https://www.michaelfcollins3.me
+enableEmoji: true
+enableGitInfo: true
+enableInlineShortcodes: true
+enableRobotsTXT: true
+googleAnalytics: UA-62548623-1
+languageCode: en-us
+markup:
+  highlight:
+    noClasses: false
+menu:
+  main:
+    - identifier: posts
+      name: Posts
+      url: /posts/
+      weight: 1
+    - identifier: tags
+      name: Tags
+      url: /tags/
+      weight: 2
+    - identifier: categories
+      name: Categories
+      url: /categories/
+      weight: 3
+newContentEditor: code
+params:
+  analytics:
+    enable: true
+    google:
+      id: UA-62548623-1
+  app:
+    title: The Imaginary Road
+  comment:
+    disqus:
+      enable: true
+      shortname: mfcollins3
+  dateFormat: January 1, 2006
+  defaultTheme: auto
+  description: Thoughts, ideas, and stories from the personal and professional life of Michael F. Collins, III.
+  fingerprint: sha256
+  footer:
+    since: 2012
+  gitRepo: https://github.com/mfcollins3/website
+  header:
+    name: The Imaginary Road
+  home:
+    profile:
+      disclaimer: The views expressed on this website are mine alone and do not necessarily reflect the views of my employer.
+      subtitle: Thoughts, ideas, and stories from the personal and professional life of Michael F. Collins, III
+      title: The Imaginary Road
+  keywords:
+    - software
+    - development
+    - engineering
+    - parenthood
+    - programming
+    - presenting
+    - education
+    - electronics
+    - lego
+    - neudesic
+  page:
+    share:
+      Linkedin: true
+  social:
+    Email: michael.collins@naked.software
+    Facebook: mfcollins3
+    GitHub: mfcollins3
+    Linkedin: michaelfcollins3
+    Medium: mfcollins3
+    Stackoverflow: 787607
+    Twitter: mfcollins3
+  timeAgo:
+    enable: false
+  verification:
+    google: VrH7LVgvAmCiD5vBXpJ61NdL4bUlGwGU-ynOhH-VUd8
+  version: 1.2.X
+permalinks:
+  posts: /posts/:year/:month/:slug/
+theme: uBlogger
+title: The Imaginary Road
