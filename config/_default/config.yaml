@@ -15,7 +15,7 @@ markup:
 menu:
   main:
     - identifier: posts
-      name: Posts
+      name: Blog
       url: /posts/
       weight: 1
     - identifier: tags
