@@ -3,7 +3,9 @@ author: michael-collins
 date: 2021-01-01T13:40:11-07:00
 description: In this post, I re-introduce my personal blog and discuss the kind of information that I will be writing about in the future.
 draft: false
-featuredImage: cover.jpg
+resources:
+- name: "featured-image"
+  src: "cover.jpg"
 subtitle: Or why am I serious this time?
 title: Welcome (Back) to The Imaginary Road
 ---
