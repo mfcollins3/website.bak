@@ -51,6 +51,7 @@ params:
   home:
     profile:
       disclaimer: The views expressed on this website are mine alone and do not necessarily reflect the views of my employer.
+      social: true
       subtitle: Thoughts, ideas, and stories from the personal and professional life of Michael F. Collins, III
       title: The Imaginary Road
   keywords:
@@ -66,13 +67,21 @@ params:
     - neudesic
   page:
     share:
+      enable: true
+      Twitter: true
+      Facebook: true
       Linkedin: true
+      Pinterest: true
+      Reddit: true
   social:
     Email: michael.collins@naked.software
     Facebook: mfcollins3
     GitHub: mfcollins3
+    Instagram: mfcollins3
     Linkedin: michaelfcollins3
-    Medium: mfcollins3
+    Medium: "@mfcollins3"
+    Quora: Michael-Collins-14
+    Pinterest: mfcollins3
     Stackoverflow: 787607
     Twitter: mfcollins3
   timeAgo:
