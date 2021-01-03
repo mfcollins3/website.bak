@@ -66,6 +66,7 @@ params:
     - lego
     - neudesic
   page:
+    lightgallery: true
     share:
       enable: true
       Twitter: true
