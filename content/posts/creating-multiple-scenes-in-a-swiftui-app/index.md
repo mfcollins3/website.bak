@@ -108,3 +108,45 @@ In order to create the second scene, I have to update `ContentView` to pass an `
 {{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "ContentView_2.swift" >}}
 
 {{< image src=second_scene_small.png alt="Showing the new second scene being displayed side-by-side with the main scene." caption="The new second scene is shown in side-by-side-mode" title="The Second Scene" src_l=second_scene.png >}}
+
+## Closing a Scene
+
+For some applications like the Safari web browser, creating a new scene and window for an application is all that you need and the user can use the **Show All Windows** view to dismiss windows that aren't needed anymore. For other scenes that are more task-based such as creating an email or typing a note, you may want the application to dismiss the scene when the scene is no longer necessary. To do that, you need to understand the concept of the scene session.
+
+If you think about the application that you are building, basically you are building a specification. Your application specifies the user experience and the behaviors and operations and how the application will react to user touches and data entry. When you or your customers run your application, iOS is creating an application instance that is based on this application. The application instance executes the specification and it is really the application instance that the user is interacting with. The application instance can terminate and the user can start a new application instance to interact with.
+
+Scenes operate the same way. A scene is basically a specification and you are let SwiftUI and UIKit know what your default or initial scene is. If you create secondary scenes, you specify what the user experience is that should be presented for that scene and what target content identifiers the scenes can handle, as we have done previously. But when iPadOS creates and runs the scene, it is actually creating and running a scene session backed by the `UISceneSession` object that is running on your device and that the customer is interacting with.
+
+When a new scene is started, iOS and iPadOS will create a new `UISceneSession` object and will tell your application that the scene session is starting. If you have a `UIApplicationDelegate` object, iOS and iPadOS will call the application delegate object to get the configuration settings for the new scene. If you define a `UISceneDelegate` object for the scene, iOS and iPadOS will call the scene delegate to let the scene delegate know that it is connected to a scene session.
+
+If your application wants to terminate a scene, it needs to tell the `UIApplication` object to *destroy* the scene. The application can pass the `UISceneSession` object to the `UIApplication.requestSceneSessionDestruction(_:options:errorHandler:)` function and `UIApplication` will terminate the scene session.
+
+With SwiftUI, there's a little wrinkle in the plan here. The problem is that with SwiftUI 2's new application model, there are no scene delegates. If you have examined SwiftUI, you have probably seen the `UIApplicationDelegateAdaptor` property wrapper. `UIApplicationDelegateAdapter` allows your application to specify and use a custom application delegate object to handle application lifecycle events such as starting analytics collection when the application launches or initializing the Core Data services. However, there's no `UISceneDelegateAdaptor` property wrapper that you can use.
+
+It's not documented anywhere that I have found, and I found this out by submitting a question through Feedback Assistant to Apple, but if you configure a scene delegate either in Info.plist or in code in the `UIApplicationDelegate.application(_:configurationForConnecting:options:)` function, then SwiftUI will use it. If you do not implement the `UISceneDelegate.scene(_:willConnectTo:options:)` function will use the scene definition in the `App` type to initialize the presentation and this would be great for a multiple scene experience such as Safari where you leave it up to the customer to dismiss windows when they are no longer necessary. But if you want your application to be able to dismiss a scene, then you need to implement `UISceneDelegate.scene(_:willConnectTo:options:)` yourself to pass the reference to the scene session to your SwiftUI code.
+
+To pass the `UISceneSession` object to my SwiftUI code, I will inject it as an environment variable in my root SwiftUI view for my scene. I will start by creating the custom `EnvironmentKey` type for the scene session:
+
+{{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "SceneSessionKey_1.swift" >}}
+
+Next, I'll create the custom scene delegate for my second scene:
+
+{{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "SceneTwoDelegate_1.swift" >}}
+
+Because I am implementing the `scene(_:willConnectTo:options:)` function on my custom scene delegate, I don't get the default SwiftUI implementation and I therefore need to create and configure the `UIWindow` object and the root SwiftUI view for the scene. Notice on line 17 how I am setting the `sceneSession` environment variable for the root view. This will make the `UISceneSession` object available to any SwiftUI view in the view hierarchy.
+
+I will update my `SceneTwoView` to add a button to destroy the scene:
+
+{{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "ContentView_3.swift" >}}
+
+I will need to create the custom application delegate type to configure the scene with the custom scene delegate:
+
+{{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "AppDelegate_1.swift" >}}
+
+Instead of configuring the new session in code, I could define the delegate in the scene manifest in `Info.plist`. You always have that option. I did it here in code to make it easier to understand what's happening instead of referencing the `Info.plist` magic.
+
+Finally, I have to reference my custom application delegate in my `MultipleSceneApp` struct:
+
+{{< gist mfcollins3 4b5b95b247e3334fc1aaca18e7c850e6 "MultipleSceneApp_3.swift" >}}
+
+You'll notice that I removed the second `WindowGroup` from the `body` property. Since I'm creating the scene in code in the scene delegate and configuring the activation conditions, there's no point in having the second `WindowGroup` here.
