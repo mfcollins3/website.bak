@@ -45,7 +45,7 @@ At WWDC 2019, Apple introduced a new concept into the application model: scenes.
 
 Scenes refactor and remove responsibilities from the `UIApplication` class and `UIApplicationDelegate` protocol and move those into the new `UIScene` class and `UISceneDelegate` object. The application delegate is still present and manages the application lifecycle events such as launching and termination, and manages global application state. Scenes and scene delegates take on more of the UI responsibilities and handle the application's user experience being activated or moved to the background.
 
-On an iPad, scenes also allow applications to provide multiple user interfaces for different tasks. Take a document editor similar to Microsoft Word. Instead of needing to manage a single user experience and provide a navigation mechanism to allow a user to switch between different documents, the application can now launch multiple scenes, hosting one document per scene. Each scene has its own window and can present its own user experience. Apple also added a new way to see all of the scenes that the application has created for the user.
+On an iPad, scenes also allow applications to provide multiple user interfaces for different tasks. Imagine a document editor similar to Microsoft Word. Instead of needing to manage a single user experience and provide a navigation mechanism to allow a user to switch between different documents, the application can now launch multiple scenes, hosting one document per scene. Each scene has its own window and can present its own user experience. Apple also added a new way to see all of the scenes that the application has created for the user.
 
 {{< image src=show_all_windows_small.png alt="Application menu showing the See All Windows option on the iPadOS Home Screen." caption="Application menu showing the Show All Windows option" title="Show All Windows Menu Option" src_l=show_all_windows.jpeg >}}
 
@@ -61,7 +61,7 @@ Each scene does not need to present a unique user experience. For example, Safar
 The rest of this post uses features in SwiftUI 2. The sample code in this post will only work on iOS 14 and newer. All of the code should work in the simulator as well as on a device.
 {{< /admonition >}}
 
-Yes. Enough of the theory and explanation of multiple scenes. How do we implement multiple scenes using SwiftUI? I'm going to start by creating a new SwiftUI application in Xcode using the new SwiftUI lifecycle.
+Enough of the theory and explanation of multiple scenes. How do we implement multiple scenes using SwiftUI? I'm going to start by creating a new SwiftUI application in Xcode using the new SwiftUI lifecycle.
 
 {{< image src=new_application.png alt="New application wizard in Xcode showing the settings for the new application. The new application will use the new SwiftUI lifecycle." caption="The new application will use the new SwiftUI lifecycle" title="Creating the Sample Application" >}}
 
