@@ -13,7 +13,7 @@ tags:
 - SwiftUI
 title: Creating Multiple Scenes in a SwiftUI App
 ---
-The latest iPad and iPad Pro devices are ripe and ready for more powerful business solutions. In this post, I will describe the ability to create multiple scenes in iPad applications.
+The latest iPad and iPad Pro devices are ripe and ready for more powerful business solutions. SwiftUI 2 has changed the application model but didn't really explain how to support some of the features specific to iPads. In this post, I will describe how to use SwiftUI 2 to create multiple scenes in iPad applications.
 
 <!--more-->
 
