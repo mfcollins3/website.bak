@@ -39,7 +39,7 @@ params:
       enable: true
       shortname: mfcollins3
     enable: true
-  dateFormat: January 1, 2006
+  dateFormat: January 2, 2006
   defaultTheme: auto
   description: Thoughts, ideas, and stories from the personal and professional life of Michael F. Collins, III.
   fingerprint: sha256

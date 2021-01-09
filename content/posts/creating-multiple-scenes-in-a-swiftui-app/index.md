@@ -2,7 +2,7 @@
 author: michael-collins
 categories:
 - iOS Development
-date: 2021-01-02T13:54:13-07:00
+date: 2021-01-09T09:20:00-07:00
 description: In this post, I cover the new SwiftUI application model that was introduced with iOS 14 and how to manage multiple scenes on iPad devices.
 draft: false
 resources:
