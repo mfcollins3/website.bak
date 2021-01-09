@@ -1,3 +1,4 @@
 [submodule "themes/uBlogger"]
 	path = themes/uBlogger
-	url = https://github.com/upagge/uBlogger.git
+	url = https://github.com/mfcollins3/uBlogger.git
+	branch = fix-gist-indents
