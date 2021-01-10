@@ -1,0 +1,30 @@
+{
+    "name": "normal-theme",
+    "version": "1.0.0",
+    "description": "Hugo theme for my personal blog and website",
+    "keywords": [
+        "hugo",
+        "theme",
+        "website",
+        "bootstrap"
+    ],
+    "homepage": "https://www.michaelfcollins3.me",
+    "bugs": {
+        "email": "mfcollins3@me.com",
+        "url": "https://github.com/mfcollins3/website/issues"
+    },
+    "license": "MIT",
+    "author": {
+        "email": "mfcollins3@me.com",
+        "name": "Michael Collins",
+        "url": "https://www.michaelfcollins3.me"
+    },
+    "repository": "github:mfcollins3/website",
+    "scripts": {
+        "build": "hugo",
+        "server": "hugo server"
+    },
+    "dependencies": {},
+    "devDependencies": {},
+    "private": true
+}

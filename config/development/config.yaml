@@ -2,3 +2,4 @@
 
 buildDrafts: true
 buildFuture: true
+theme: normal
