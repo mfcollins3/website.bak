@@ -25,6 +25,8 @@
         "server": "hugo server"
     },
     "dependencies": {},
-    "devDependencies": {},
+    "devDependencies": {
+        "bootstrap": "^5.0.0-beta1"
+    },
     "private": true
 }
