@@ -69,29 +69,37 @@ Before I start creating user stories from the list above, I'm going to start wit
 Next, I'll go through a simple workflow for writing a blog post:
 
 2. Clone my website repository
-3. Create a blog post
-4. Edit a blog post
-5. Commit my changes
-6. Publish my changes
-7. Search Unsplash for a feature image
-8. Embed an Unsplash image
-9. Import a feature image from the photo library
-10. Capture a feature image using the camera
-11. Embed a photo library image
-12. Embed a camera image
-13. Create a Gist
-14. Insert a Gist
-15. Edit a Gist
-16. Create a source code sample
-17. Edit a source code sample
-18. Create a diagram
-19. Edit a diagram
-20. Publish notification of new blog post on Twitter
+2. Create a blog post
+2. Edit a blog post
+2. Commit my changes
+2. Publish my changes
+2. Create a pull request
+2. Review a pull request
+2. Approve a pull request
+2. Create an issue for a topic to write about
+2. Add information to a topic issue
+2. Search Unsplash for a feature image
+2. Embed an Unsplash image
+2. Import a feature image from the photo library
+2. Capture a feature image using the camera
+2. Embed a photo library image
+2. Embed a camera image
+2. Create a Gist
+2. Insert a Gist
+2. Edit a Gist
+2. Create a source code sample
+2. Edit a source code sample
+2. Create a diagram
+2. Edit a diagram
+2. Publish notification of new blog post on Twitter
+2. Approve a moderated Disqus comment
+2. Reject a moderated Disqus comment
+2. Reply to a Disqus comment
 
 I'll start with this set of stories and will probably add a few more as I build out Naked Blogging.
 
 ## What Do I Want to Achieve?
 
-I have tried building Naked Blogging a couple of times only to have to shelve it because Life got in the way. Either my kids needed me, my wife needed me, or my day job needed me. I think a couple of times after I stepped away I had forgotten where I was and became frustrated and scapped it again. My hope is that my transparency in how I am going to build it by blogging about my activities will help to keep me focused on my goal, and help me to be successful in this latest attempt.
+I have tried building Naked Blogging a couple of times only to have to shelve it because *Life* got in the way. Either my kids needed me, my wife needed me, or my day job needed me. I think a couple of times after I stepped away I had forgotten where I was and became frustrated and scapped it again. My hope is that my transparency in how I am going to build it by blogging about my activities will help to keep me focused on my goal, and help me to be successful in this latest attempt.
 
 Feel free to follow along, ask questions, and in the not-so-distant future, try out the application yourself and let me know what you think. I'll be blogging and demonstrating the features as I build them, and my hope is that by the time I am finished blogging about a new feature, I'll be ready to include it in a TestFlight build. If you join my TestFlight early adopters group, you'll get to experience the features for yourself.
