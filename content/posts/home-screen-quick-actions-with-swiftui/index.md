@@ -2,9 +2,9 @@
 author: michael-collins
 categories:
 - iOS Development
-date: 2021-01-09T20:09:00-07:00
+date: 2021-01-10T12:14:00-07:00
 description: Home Screen quick actions are a great way to expose common actions that your customers perform using your application. When SwiftUI 2 was released, there was surprisingly little said about how to implement quick actions in new applications. I will show you how to use custom scene delegates to support Home Screen quick actions in your SwiftUI apps.
-draft: true
+draft: false
 resources:
 - name: "featured-image"
   src: "home_screen_quick_action.png"
