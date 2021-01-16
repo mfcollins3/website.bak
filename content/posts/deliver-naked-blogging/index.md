@@ -562,4 +562,204 @@ The `release_beta_app_to_early_adopters` lane uses the second function of Pilot 
 
 When I run `bundle exec fastlane release_beta_app_to_early_adopters`, Fastlane will use the App Store Connect API to submit my build to Apple for review. If Apple approves my beta release, then members of my early adopters group will be notified and will be able to download the new build.
 
+## Snapshot and Frameit
+
+We're getting close now to getting the application into the App Store and accessible to our customers. So far I have distributed the application to internal testers using Microsoft App Center. I next distributed the application to internal stakeholders using TestFlight. I then released the application to my 10,000 external early adopter users also through TestFlight. Before we can submit our applications to the App Store, we have to prepare the marketing materials for the application. The marketing materials can be the text descriptions, pricing information, rating information, and new privacy information. Apple also needs the screenshots to display in the App Store listing so that the customer can see what the application can do. I'm going to focus on the screenshots first before jumping into the other application metadata.
+
+Fastlane provides two tools to help us prepare the screenshots: [Snapshot](https://docs.fastlane.tools/actions/snapshot/) and [Frameit](https://docs.fastlane.tools/actions/frameit/). Snapshot is used to capture screenshots from an iOS Simulator. Snapshot is driven using automated UI tests that tell Snapshot when to capture a picture of the simulator screen. After Snapshot captures the screenshots, Frameit will take the screenshots and will wrap an iPhone or iPad device frame around the screenshot and will render the device frame over a background with marketing text.
+
+Snapshot generates some Swift source code that we need to include in the UI test bundle, so we need to generate that source code first. Run this command in a terminal:
+
+    bundle exec fastlane snapshot init
+
+This command will generate two files in your `fastlane` directory: `Snapfile` and `SnapshotHelper.swift`. `Snapfile` is a placeholder for global default settings for Snapshot. `SnapshotHelper.swift` is the file that you want to include in your UI test bundle.
+
+The Apple App Store requires that screenshots be provided for several screen sizes. Unfortunately, I can't open Xcode and start an iOS Simulator for a 6.5-inch display. I need to map the required display sizes to an actual iOS Simulator device type. I have found that the following device types map to the required screen sizes:
+
+| Screen Size | Device Name                           |
+|-------------|---------------------------------------|
+| 6.5-inch    | iPhone 11 Pro Max                     |
+| 5.8-inch    | iPhone 11 Pro                         |
+| 5.5-inch    | iPhone 8 Plus                         |
+| 4.7-inch    | iPhone 8                              |
+| 4-inch      | iPhone SE (1st generation)            |
+| 3.5-inch    | Not supported                         |
+| 12.9-inch   | iPad Pro (12.9-inch) (3rd generation) |
+| 11-inch     | iPad Pro (11-inch) (2nd generation)   |
+| 12.9-inch   | iPad Pro (12.9-inch) (2nd generation) |
+| 10.5-inch   | iPad Air (3rd generation)             |
+| 9.7-inch    | iPad (6th generation)                 |
+
+The problem with some of these device types is that as of Xcode 12, the devices don't come standard as iOS Simulator devices. Notice the 3.5-inch screen size is not supported. As of iOS 14, there are no active devices that support a 3.5-inch display. If you don't provide it, the App Store will scale the 4-inch display images.
+
+To help me automate creating the necessary device types that I need, especially in a DevOps environment, I created a shell script to automate creating the devices:
+
+{{< highlight bash "linenos=table" >}}
+echo "Creating iPhone SE (1st generation)"
+
+xcrun simctl create "iPhone SE (1st generation)" \
+	"com.apple.CoreSimulator.SimDeviceType.iPhone-SE" \
+	"com.apple.CoreSimulator.SimRuntime.iOS-14-3"
+
+echo "Creating iPad Pro (12.9-inch) (3rd generation)"
+
+xcrun simctl create "iPad Pro (12.9-inch) (3rd generation)" \
+	"com.apple.CoreSimulator.SimDeviceType.iPad-Pro--12-9-inch---3rd-generation-" \
+	"com.apple.CoreSimulator.SimRuntime.iOS-14-3"
+
+echo "Creating iPad Pro (12.9-inch) (2nd generation)"
+
+xcrun simctl create "iPad Pro (12.9-inch) (2nd generation)" \
+	"com.apple.CoreSimulator.SimDeviceType.iPad-Pro--12-9-inch---2nd-generation-" \
+	"com.apple.CoreSimulator.SimRuntime.iOS-14-3"
+
+echo "Creating iPad (6th generation)"
+
+xcrun simctl create "iPad (6th generation)" \
+	"com.apple.CoreSimulator.SimDeviceType.iPad--6th-generation-" \
+	"com.apple.CoreSimulator.SimRuntime.iOS-14-3"
+
+echo "Creating iPad Air (3rd generation)"
+
+xcrun simctl create "iPad Air (3rd generation)" \
+	"com.apple.CoreSimulator.SimDeviceType.iPad-Air--3rd-generation-" \
+	"com.apple.CoreSimulator.SimRuntime.iOS-14-3"
+{{< /highlight >}}
+
+With the devices created, I customize the global settings for Snapshot in `Snapfile`:
+
+{{< highlight ruby "linenos=true" >}}
+workspace 'Blogging.xcworkspace'
+scheme 'Snapshots'
+
+devices [
+  'iPhone 11 Pro Max',
+  'iPhone 11 Pro',
+  'iPhone 8 Plus',
+  'iPhone 8',
+  'iPhone SE (1st generation)',
+  'iPad Pro (12.9-inch) (3rd generation)',
+  'iPad Pro (11-inch) (2nd generation)',
+  'iPad Pro (12.9-inch) (2nd generation)',
+  'iPad Air (3rd generation)',
+  'iPad (6th generation)'
+]
+languages ['en-US']
+
+clear_previous_screenshots true
+override_status_bar true
+{{< /highlight >}}
+
+For Snapshot, I do not integrate Snapshot with my real automated UI tests. I want to keep real tests away from marketing stuff. I will instead create a new UI test bundle target and use that to implement my UI automation scenarios for Snapshot. I will then add `SnapshotHelper.swift` to the new UI test bundle target so that I can use it in my UI automations to capture screenshots. After creating the new UI test bundle, I will create a new scheme in Xcode to run my test bundle.
+
+I modified the single UI test that was generated with the new bundle and added the code to capture a single screenshot once the application launches:
+
+{{< highlight swift "linenos=table" >}}
+import XCTest
+
+class Snapshots: XCTestCase {
+  override func setUpWithError() throws {
+    continueAfterFailure = false
+  }
+
+  func testExample() throws {
+    let app = XCUIApplication()
+    setupSnapshot(app)
+    app.launch()
+
+    snapshot("0Launch")
+  }
+}
+{{< /highlight >}}
+
+I can now run Snapshot to test that it can capture screenshots of the application:
+
+    bundle exec fastlane snapshot
+
+Snapshot will build the application and start up iOS Simualators for each of the device types that I specified. The UI test bundle will run and screenshots will be captured and output to the `fastlane/screenshots` directory.
+
+The next step is to turn these screenshots into actual marketing material. We will use Frameit to put device frames around the screenshots and then render a background behind the device with some marketing text that we specify.
+
+First, I need a background image that I will place all of the screenshots on. I used Sketch to build a flat color image that is 3480x2160 and uses the same background color as my application icon. I saved the background image to `fastlane/screenshots/background.jpg`. 
+
+Next, I need to pick fonts that I am going to use for the marketing text on the screenshots. I'm just going to use [Open Sans](https://fonts.google.com/specimen/Open+Sans) for now. I will download and store the bold and regular font files in the `fastlane/screenshots/fonts` subdirectory.
+
+Frameit will look for screenshot information in the `fastlane/screenshots/Framefile.json` file. I'll add the initial configuration there:
+
+{{< highlight json "linenos=table" >}}
+{
+  "device_frame_version": "latest",
+  "default": {
+    "background": "background.jpg",
+    "keyword": {
+      "color": "#ffffff",
+      "font": "fonts/OpenSans-Bold.ttf"
+    },
+    "title": {
+      "color": "#ffffff",
+      "font": "fonts/OpenSans-Regular.ttf"
+    },
+    "padding": 50
+  },
+  "data": [
+    {
+      "filter": "0Launch"
+    }
+  ]
+}
+{{< /highlight >}}
+
+The actual text for the marketing frames is stored in `.strings` files in localizable directories. Here's my `en-US/title.strings` file:
+
+{{< highlight plain "linenos=1" >}}
+// The first line needs to be blank
+"0Launch" = "This is the home screen";
+{{< /highlight >}}
+
+Here's my `en-US/keyword.strings` file:
+
+{{< highlight plain "linenos=1" >}}
+// The first line needs to be blank
+"0Launch" = "Home";
+{{< /highlight >}}
+
+{{< admonition type="warning" title="Note about the .strings Files" open="true" >}}
+Notice the `// The first line needs to be blank` comment in the `.strings` files. The comment should not appear in the file that you create. The first line needs to be completely blank.
+{{< /admonition >}}
+
+With the metadata in place, I can run Frameit to generate the marketing screenshots. Note that Frameit will look recursively in my directory hierarchy for images to frame. I'm therefore going to make sure that it runs in the `fastlane` subdirectory to only pick up the screenshot images:
+
+    cd fastlane && bundle exec fastlane frameit && cd ..
+
+Here's the framed screenshot for the iPhone 11 Pro Max:
+
+{{< image src=framed.png alt="Framed screenshot showing the application on an iPhone 11 Pro Max with the background and marketing visible at the top." caption="This screenshot shows the framed device on an iPhone 11 Pro Max" title="Framed Screenshot" >}}
+
+Now that Snapshot and Frameit are configured, I can automate building the screenshots for the Apple App Store:
+
+{{< highlight ruby "linenos=table" >}}
+lane :update_screenshots do
+  derived_data_path = 'build/derived_data/snapshots'
+  scan(
+    clean: true,
+    build_for_testing: true,
+    derived_data_path: derived_data_path
+  )
+  snapshot(
+    skip_open_summary: true,
+    test_without_building: true,
+    derived_data_path: derived_data_path
+  )
+  frameit
+end
+{{< /highlight >}}
+
+The `update_screenshots` lane will use Scan again to build the test version of the applicatoon and my Screenshots UI test bundle that drives the application to the points of interest for the screenshots. After the application is built, I use the `snapshot` action to capture the screenshots using the iOS Simulator. Finally, I call `frameit` to frame the screenshots and add the background and marketing text.
+
+{{< admonition type="tip" title="Do I Store Screenshots in the Git Repository?" open="true" >}}
+If you try running Snapshot and Frameit with a single screenshot and a single language, you can already see that Snapshot and Frameit are expensive operations. These are probably not operations that you want to run in a continuous integration or normal DevOps process. This might be a manual *run once before we release* type of activity. I recommend saving the framed screenshots in your Git repository in order to make it easy to release using the saved screenshots.
+
+If you are using Git large file storage (LFS), you should consider adding the screenshots to your LFS store.
+{{< /admonition >}}
+
 <span>Photo by <a href="https://unsplash.com/@birminghammuseumstrust?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Birmingham Museums Trust</a> on <a href="https://unsplash.com/s/photos/assembly-line?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
