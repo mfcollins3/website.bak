@@ -762,4 +762,134 @@ If you try running Snapshot and Frameit with a single screenshot and a single la
 If you are using Git large file storage (LFS), you should consider adding the screenshots to your LFS store.
 {{< /admonition >}}
 
+## Deliver
+
+We have made it! We are in the final stretch! The light at the end of the tunnel can be seen. Let us look back at what we have accomplished so far:
+
+1. We used Produce to register the application with the Apple App Store
+2. We used Match to generate the code signing certificates and provisioning profiles for distributing the application
+3. We used Scan to run the unit tests to make sure that no code changes broke other parts of the application
+4. We used Gym to build an ad hoc distribution of the application which we deployed to Microsoft App Center for internal testers
+5. We used Gym to build a distribution of the application that we distributed to internal stakeholders using Apple's TestFlight Service using Pilot
+6. We used Pilot to release the application to up to 10,000 external early adopters using TestFlight
+7. We used Snapshot and Frameit to capture and prepare application screenshots for the Apple App Store.
+
+All that is left is to actually release the application to the general public through the Apple App Store. To do this, we will use yet another tool provided by Fastlane: [Deliver](https://docs.fastlane.tools/actions/deliver/).
+
+App Store applications have a lot of textual metadata and settings that need to be updated on the App Store before being released. For example, every application has release notes, a description, the title, the category, rating information, and now privacy information. It should make sense to keep this information in the Git repository so that you can track changes to the application metadata. Deliver helps us to do this. To start, I will use Deliver to download the existing metadata (if any) from the Apple App Store and create text files that I can use to update the metadata in the future. Run this command in a terminal:
+
+    bundle exec fastlane deliver init
+
+The existing application metadata (which may be empty) will be stored in individual text files in the `fastlane/metadata` directory. You can now add these files to your Git repository and track their changes like other source files.
+
+Like other Fastlane tools, Deliver supports a `Deliverfile` module where you can store global default settings that should be used for all Deliver runs. My `Deliverfile` looks like this:
+
+{{< highlight ruby "linenos=table" >}}
+app '1511233168'
+app_rating_config_path 'fastlane/app_rating.json'
+app_review_attachment_file 'Documentation/AppleAppReviewGuide.pdf'
+automatic_release true
+phased_release true
+price_tier 0
+skip_binary_upload true
+submission_information({
+  'add_id_info_limits_tracking' => false,
+  'add_id_info_serves_ads' => false,
+  'add_id_info_tracks_action' => false,
+  'add_id_info_trans_install' => false,
+  'add_if_info_uses_idfa' => false,
+  'content_rights_contains_third_party_content' => false,
+  'content_rights_has_rights' => true,
+  'export_compliance_available_on_french_store' => true,
+  'export_compliance_contains_proprietary_cryptography' => false,
+  'export_compliance_contains_third_party_cryptography' => false,
+  'export_compliance_is_exempt' => true,
+  'export_compliance_uses_encryption' => true,
+  'export_compliance_app_type' => nil,
+  'export_compliance_encryption_updated' => true,
+  'export_compliance_compliance_required' => false,
+  'export_compliance_platform' => nil
+})
+{{< /highlight >}}
+
+In `Deliverfile`, notice line 2 references a `fastlane/app_rating.json` file. This file is a JSON file that is used to configure the age/maturity level rating that is advertised for the application on the Apple App Store. My `app_rating.json` file is below:
+
+{{< highlight json "linenos=1" >}}
+{
+  "violenceCartoonOrFantasy": "NONE",
+  "violenceRealistic": "NONE",
+  "violenceRealisticProlongedGraphicOrSadistic": "NONE",
+  "profanityOrCrudeHumor": "NONE",
+  "matureOrSuggestiveThemes": "NONE",
+  "horrorOrFearThemes": "NONE",
+  "medicalOrTreatmentInformation": "NONE",
+  "alcoholTobaccoOrDrugUseOrReferences": "NONE",
+  "gamblingSimulated": "NONE",
+  "sexualContentOrNudity": "NONE",
+  "secualContentGraphicAndNudity": "NONE",
+  "unrestrictedWebAcces": false,
+  "gamblingAndContests": false
+}
+{{< /highlight >}}
+
+On line 3 of `Deliverfile`, the `app_review_attachment_file` setting references a PDF in my Git repository. This is a document that I prepare and upload with my application with background information that the Apple reviewer can use when reviewing and evaluating the application. I have no idea if they use it, but I prepare it just in case it can help to answer any questions that they have about how to use the application.
+
+Since December 8, 2020, Apple has required developers to declare and share privacy information with customers. Developers are required to declare what data is collected from the user and how it is used by the software publisher. Fastlane has support for publishing this data and can track the privacy settings in your Git repository. The application privacy information is stored in the `fastlane/app_privacy_details.json` file. To create this file, run the following command in the terminal and answer the questions provided:
+
+    bundle exec fastlane run upload_app_privacy_details_to_app_store skip_upload:true
+
+Now that all of the metadata has been downloaded or created and updated, and screenshots have been prepared, it is time to release the application to customers. I will do this in two steps. First, I will use Deliver to automate uploading the metadata, screenshots, and privacy details to the Apple App Store so that I can review everything in App Store Connect before publishing. Once everything looks good, I will use Deliver to submit the application build to Apple for review.
+
+First, I will create the `prepare_appstore` lane to upload all of the metadata and screenshots:
+
+{{< highlight ruby "linenos=1" >}}
+lane :prepare_appstore do
+  project = 'Sources/Blogging/Blogging.xcodeproj'
+  version_number = get_version_number(xcodeproj: project)
+  build_number = get_build_number(xcodeproj: project)
+
+  deliver(
+    app_version: version_number,
+    build_number: build_number,
+    force: true,
+    overwrite_screenshots: true
+  )
+  upload_app_privacy_details_to_app_store(
+    json_path: 'fastlane/app_privacy_details.json'
+  )
+end
+{{< /highlight >}}
+
+The first command will upload all of the metadata and screenshots to the application profile on App Store Connect. Deliver will also run the [Precheck](https://docs.fastlane.tools/actions/precheck/) to automate several checks on the profile to look for common issues that may result in Apple rejecting the application. The `upload_app_privacy_detals_to_app_store` action will upload the privacy details to Apple to share in the App Store page for the application.
+
+After reviewing and approving the App Store settings for the application, it's time to send the application to Apple for review and release to the Apple App Store. I will use Deliver again to select the build to submit and submit the build to Apple:
+
+{{< highlight ruby "linenos=table" >}}
+lane :release_app do
+  project = 'Sources/Blogging/Blogging.xcodeproj'
+  version_number = get_version_number(xcodeproj: project)
+  build_number = get_build_number(xcodeproj: project)
+
+  deliver(
+    app_version: version_number,
+    build_number: build_number,
+    submit_for_review: true,
+    force: true,
+    skip_binary_upload: true,
+    skip_screenshots: true,
+    skip_metadata: true
+  )
+end
+{{< /highlight >}}
+
+{{< admonition type="note" title="About the Version and Build Numbers" open="true" >}}
+You'll notice in the previous two code samples that I am reading the version number and build number from the Xcode project still. This is temporary. I will manage these at the DevOps level in the near future, but that will probably be another blog post.
+{{< /admonition >}}
+
+The `release_app` lane will contact App Store Connect, select the build that I earlier uploaded and distributed to early adopters with TestFlight, and will submit the application to Apple to review.
+
+## Oh, The Places We Have Gone!
+
+When I started writing this blog post, I had the best intentions of showing you how to automate the application release and delivery process. There's still parts that need to be covered such as how to put this into a fully automated DevOps scenario. But in this post, I have shown you how to use Fastlane Tools to automate all of the steps for building and releasing iOS applications to the App Store. Next, I will come back and revise the automation and tie it into a DevOps pipeline using GitHub Actions.
+
 <span>Photo by <a href="https://unsplash.com/@birminghammuseumstrust?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Birmingham Museums Trust</a> on <a href="https://unsplash.com/s/photos/assembly-line?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
