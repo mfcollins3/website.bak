@@ -2,9 +2,9 @@
 categories:
 - Naked Blogging
 - iOS Development
-date: 2021-01-10T16:24:36-07:00
+date: 2021-01-16T15:12:00-07:00
 description: In this post, I talk about using Fastlane Tools to automate the process of building, testing, and shipping the Naked Blogging application to customers using the Apple App Store.
-draft: true
+draft: false
 resources:
 - name: "featured-image"
   src: "feature.jpg"
