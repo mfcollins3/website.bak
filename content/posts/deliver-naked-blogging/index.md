@@ -458,4 +458,108 @@ After running this lane, I can see the build was uploaded to App Center and I re
 
 {{< image src=app_center_install.png alt="The installation page allows my internal testers to download and install the Naked Blogging build that was uploaded to App Center. Notice that the release notes from the changelog were successfully updated." caption="The installation page allows testers to download and install Naked Blogging." title="App Center Installation Page" >}}
 
+## Pilot
+
+If you are still with me at this point, I have verified that my application is passing the unit tests and I have released an ad hoc build for my internal testers to test in order to find and report defects. I will move forward to my next automation which is making the application available to early adopters using Apple's [TestFlight](https://developer.apple.com/testflight/) service.
+
+TestFlight allows me to expose the application to a greater set of testers. First, I can expose the application to more internal stakeholders for more internal testing. This could be product owners for example. TestFlight allows me to invite up to 100 users into my internal testing group, and those internal users can install Naked Blogging on up to 30 individual test devices. When I am ready to go out to a greater group of external early adopters, I can invite up to 10,000 early adopters into my beta test group. I can either invite early adopters individually, or I can distribute a link via email or social media that early adopters can use to join my test group.
+
+First, I will need to build the application and export an IPA archive that can be distributed to the Apple App Store:
+
+{{< highlight ruby "linenos=table" >}}
+lane :build_appstore_application do
+  match(type: 'appstore', readonly: true)
+
+  gym(
+    output_directory: 'build/output/appstore',
+    derived_data_path: 'build/derived_data/appstore'
+  )
+end
+{{< /highlight >}}
+
+Like before, the call to Match here uses the `readonly` parameter set to `true`, which means that Match will only download and install the code signing certificate and provisioning profile from my certificates Git repository. Gym will use the provisioning profile and code signing certificate that is configured in the Xcode project for release builds.
+
+Now that I can produce the IPA archive for distribution using the Apple App Store, my next goal is to upload the application to Apple and make it available to internal testers using Apple's TestFlight service. Before I do anything, I need to do a little refactoring of `Fastfile`. Because I will be communicating with Apple's APIs to upload my IPA archive, I need to authenticate with Apple and obtain an access token for Fastlane to use to invoke the Apple APIs. Since I already did this with Match earlier, I am going to extract that code that obtained the access key into a new private lane than I can call from other lanes:
+
+{{< highlight ruby "linenos=table" >}}
+private_lane :log_into_appstore do
+  app_store_connect_api_key(
+    key_id: ENV['APPLE_KEY_ID'],
+    issuer_id: ENV['APPLE_ISSUER_ID'],
+    key_content: ENV['APPLE_KEY'],
+    in_house: false
+  )
+end
+{{< /highlight >}}
+
+Next, I will introduce a new Fastlane Tool named [Pilot](https://docs.fastlane.tools/actions/pilot/). Pilot provides several functions for us when working with TestFlight. The first function that I will demonstrate is uploading the application to TestFlight and making it available for internal testers. I will create a new Fastlane lane named `upload_build_to_testflight` to publish a new beta build to the TestFlight service for internal testers to test:
+
+{{< highlight ruby "linenos=table" >}}
+lane :upload_build_to_testflight do
+  log_into_appstore
+
+  build_appstore_application
+
+  changelog = read_changelog
+  pilot(
+    ipa: 'build/output/appstore/Blogging.ipa',
+    demo_account_required: false,
+    beta_app_review_info: {
+      contact_email: 'michael.collins@naked.software',
+      contact_first_name: 'Michael',
+      contact_last_name: 'Collins',
+      contact_phone: '2135551212',
+      demo_account_name: '',
+      demo_account_password: '',
+      notes: ''
+    },
+    localized_app_info: {
+      'default': {
+        feedback_email: 'michael.collins@naked.software',
+        marketing_url: 'https://www.nakedblogging.app',
+        privacy_policy_url: 'https://www.iubenda.com/privacy-policy/75052267',
+        description: 'Naked Blogging is an application that helps users to maintain blogs and publish new content from their devices.'
+      }
+    },
+    localized_build_info: {
+      'default': {
+        whats_new: changelog
+      }
+    },
+    uses_non_exempt_encryption: false
+  )
+end
+{{< /highlight >}}
+
+If I try to run this lane right now, the build will fail. The problem is that when you upload a build to the App Store for use on TestFlight, some basic validation happens on the IPA that you upload. The issue that will trigger a failure immediately is that my application does not have an icon. I can't distribute an application through TestFlight without an icon, so I'll have to create one quickly. Given my limited drawing skills, I quickly whipped up this icon in [Sketch](https://sketchapp.com):
+
+{{< image src=Icon.png alt="The application icon is intended to look like a book or journal and a pencil." caption="The application icon I will use until I come up with something better." title="The Naked Blogging Application Icon" >}}
+
+Now running the new `upload_build_to_testflight` lane will successfully upload the application to Apple's TestFlight service and make it available for internal testers to download and install using the Apple TestFlight application.
+
+So let us say that after a few days or a week or so the internal testers play with the application and decide that they want to see what the early adopter community thinks of the new features. The next step is to submit the application to Apple to release to the early adopters testing group. If this is the first time that I am making the release available for early adopters, Apple may require a review of the application similar to the App Store review, otherwise the application may get released immediately. I can create a new lane to promote the build for me and release it to the early adopters:
+
+{{< highlight ruby "linenos=table" >}}
+lane :release_beta_app_to_early_adopters do
+  log_into_appstore
+
+  project = 'Sources/Blogging/Blogging.xcodeproj'
+  version_number = get_version_number(xcodeproj: project)
+  build_number = get_build_number(xcodeproj: project)
+
+  pilot(
+    distribute_only: true,
+    distribute_external: true,
+    notify_external_testers: true,
+    app_version: version_number,
+    build_number: version_number,
+    groups: ['Early Adopters']
+  )
+end
+{{< /highlight >}}
+
+The `release_beta_app_to_early_adopters` lane uses the second function of Pilot to promote a build and submit the build to Apple for review and release to external testers, in this case, my early adopters group. You will notice that I am using the `get_version_number` and `get_build_number` actions in Fastlane to read the version number and build number stored in my Xcode project. Pilot needs to know what build to promote to public testing. When I wire this up in an automated DevOps pipeline, I will replace this logic with values from somewhere else, but for now this will work.
+
+When I run `bundle exec fastlane release_beta_app_to_early_adopters`, Fastlane will use the App Store Connect API to submit my build to Apple for review. If Apple approves my beta release, then members of my early adopters group will be notified and will be able to download the new build.
+
 <span>Photo by <a href="https://unsplash.com/@birminghammuseumstrust?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Birmingham Museums Trust</a> on <a href="https://unsplash.com/s/photos/assembly-line?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
