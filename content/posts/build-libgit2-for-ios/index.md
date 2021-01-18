@@ -3,7 +3,7 @@ categories:
 - Naked Blogging
 - iOS Development
 date: 2021-01-17T22:45:00-07:00
-description: In this post, I will show you how to build libgit2 for use in iOS and Ctalyst applications and package it up using Swift Package Manager to include in your own applications.
+description: In this post, I will show you how to build libgit2 for use in iOS and Catalyst applications and package it up using Swift Package Manager to include in your own applications.
 draft: false
 resources:
 - name: "featured-image"
