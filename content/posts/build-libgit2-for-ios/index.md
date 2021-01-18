@@ -840,3 +840,5 @@ In this article, I showed you how I built libgit2, libssh2, and OpenSSL from sou
 In future posts, I will develop out my Swift wrapper API over libgit2 as I integrate Git functionality into my application. There's a lot of content and use cases to cover and I don't want to write another really long post (this post already seems long enough).
 
 If you want to try my libgit2 frameworks with your own application, it is hosted in on GitHub at [mfcollins3/libgit2-ios](https://github.com/mfcollins3/libgit2-ios).
+
+<span>Photo by <a href="https://unsplash.com/@yancymin?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Yancy Min</a> on <a href="https://unsplash.com/s/photos/git?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
