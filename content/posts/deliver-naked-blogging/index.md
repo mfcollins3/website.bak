@@ -892,4 +892,6 @@ The `release_app` lane will contact App Store Connect, select the build that I e
 
 When I started writing this blog post, I had the best intentions of showing you how to automate the application release and delivery process. There's still parts that need to be covered such as how to put this into a fully automated DevOps scenario. But in this post, I have shown you how to use Fastlane Tools to automate all of the steps for building and releasing iOS applications to the App Store. Next, I will come back and revise the automation and tie it into a DevOps pipeline using GitHub Actions.
 
+{{< rawhtml >}}
 <span>Photo by <a href="https://unsplash.com/@birminghammuseumstrust?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Birmingham Museums Trust</a> on <a href="https://unsplash.com/s/photos/assembly-line?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+{{< /rawhtml >}}

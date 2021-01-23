@@ -841,4 +841,6 @@ In future posts, I will develop out my Swift wrapper API over libgit2 as I integ
 
 If you want to try my libgit2 frameworks with your own application, it is hosted in on GitHub at [mfcollins3/libgit2-ios](https://github.com/mfcollins3/libgit2-ios).
 
+{{< rawhtml >}}
 <span>Photo by <a href="https://unsplash.com/@yancymin?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Yancy Min</a> on <a href="https://unsplash.com/s/photos/git?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
+{{< /rawhtml >}}
