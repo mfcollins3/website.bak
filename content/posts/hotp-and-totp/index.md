@@ -3,7 +3,7 @@ categories:
 - Algorithms
 date: 2021-01-23T11:04:43-07:00
 description: In this post, I will tell you all that you need to know about how those one time passwords that you receive in texts, emails, or authentication programs work.
-draft: true
+draft: false
 math:
   enable: true
 resources:
