@@ -65,6 +65,8 @@ params:
     - electronics
     - lego
     - neudesic
+  math:
+    enable: true
   page:
     lightgallery: true
     share:
