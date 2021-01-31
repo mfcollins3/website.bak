@@ -1,7 +1,7 @@
 ---
 categories:
 - Naked Blogging
-date: 2021-01-30T10:35:22-07:00
+date: 2021-01-31T14:10:00-07:00
 description: In my previous post, I showed you how I am building libgit2 for iOS to use it in Naked Blogging. In this post, I will begin using it to clone my website repository to my iPad.
 draft: false
 resources:
